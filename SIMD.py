@@ -128,7 +128,8 @@ def expr_convert_to_SIMD_intrins(expr, map_sym_to_rat=None, prefix="", SIMD_find
         return arg
 
     if map_sym_to_rat is None:
-        expr, map_sym_to_rat = cse_preprocess(expr)
+        cse_preprocessed_expr_list, map_sym_to_rat = cse_preprocess(expr)
+        expr = cse_preprocessed_expr_list[0]
 
     map_rat_to_sym = {map_sym_to_rat[v]:v for v in map_sym_to_rat}
 
