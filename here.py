@@ -6,21 +6,24 @@ import sys
 
 _here = os.path.realpath(os.getcwd())
 
+
 def here(*args):
-    herell(False,*args)
+    herell(False, *args)
+
 
 def herecc(*args):
-    herell(True,*args)
+    herell(True, *args)
 
-def herell(usecc,*args):
+
+def herell(usecc, *args):
     import inspect
     stack = inspect.stack()
     frame = stack[2]
     if usecc:
-        herestr = re.sub(r"^herecc\((.*)\)$",r"HERE: \1:",frame.code_context[0].strip())
+        herestr = re.sub(r"^herecc\((.*)\)$", r"HERE: \1:", frame.code_context[0].strip())
     else:
         herestr = "HERE:"
-    if type(frame) == tuple:
+    if isinstance(frame, tuple):
         frame = frame[0]
         fname = _here
         line = frame.f_lineno
@@ -28,15 +31,16 @@ def herell(usecc,*args):
         fname = os.path.realpath(frame.filename)
         line = frame.lineno
     if fname.startswith(_here):
-        fname = fname[len(_here)+1:]
-    assert type(fname) == str
-    assert type(line) == int
-    nargs = [colored(herestr,"cyan"),fname+":"+colored(line,"yellow")] + list(args) #, flush=True)
+        fname = fname[len(_here) + 1:]
+    assert isinstance(fname, str)
+    assert isinstance(line, int)
+    nargs = [colored(herestr, "cyan"), fname + ":" + colored(line, "yellow")] + list(args)  # , flush=True)
     print(*nargs)
     sys.stdout.flush()
     sys.stderr.flush()
     frame = None
     stack = None
+
 
 if __name__ == "__main__":
     here(_here)

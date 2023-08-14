@@ -123,10 +123,8 @@ def extract_from_list_of_deriv_vars__base_gfs_and_deriv_ops_lists(list_of_deriv_
         #            in the suffix of a variable name matches the
         #            number of U's + D's in the variable name:
         varstr = str(var)
-        num_UDs = 0
-        for i in range(len(varstr)):
-            if varstr[i] == 'D' or varstr[i] == 'U':
-                num_UDs += 1
+        # Count number of "D" and "U" in the varstr.
+        num_UDs = varstr.count('D') + varstr.count('U')
         num_digits = 0
         i = len(varstr) - 1
         while varstr[i].isdigit():
@@ -244,8 +242,6 @@ def read_from_memory_Ccode_onept(gfname,idx, FDparams, idxs=set()):
     else:
         ijklstring = ijkl_string(idx4, FDparams)
     gfaccess_str = gri.gfaccess(gf_array_name,gfname,ijklstring,"USE")
-    if gfaccess_str.endswith("DD00"):
-        raise Exception()
     idxs.add(",".join([str(ii) for ii in idx4]))
     if FDparams.enable_SIMD == "True":
         retstring = type__var(gfname, FDparams) + varsuffix(gfname, idx4, FDparams) + " = ReadSIMD(&" + gfaccess_str + ");"
@@ -324,7 +320,7 @@ def varsuffix(name, idx4, FDparams):
     """
     base_suffix = getsuffix(name)
     if idx4 == [0, 0, 0, 0]:
-        return base_suffix 
+        return base_suffix
     return base_suffix + "_" + ijkl_string(idx4, FDparams).replace(",", "_").replace("+", "p").replace("-", "m")
 
 def read_gfs_from_memory(list_of_base_gridfunction_names_in_derivs, fdstencl, sympyexpr_list, FDparams, idxs=None):

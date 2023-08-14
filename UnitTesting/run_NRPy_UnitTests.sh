@@ -55,7 +55,7 @@ add_test WeylScal4NRPy/tests/test_WeylScal4NRPy.py
 # TODO: add your tests here
 echo "Starting doctest unit tests!"
 failed_unittest=0
-for file in expr_tree.py indexedexp.py loop.py functional.py finite_difference_helpers.py assert_equal.py sugar.py; do
+for file in expr_tree.py indexedexp.py loop.py functional.py finite_difference_helpers.py assert_equal.py sugar.py SIMD.py; do
     echo Running doctest on file: $file
     $PYTHONEXEC -m doctest $file
     if [ $? == 1 ]
@@ -75,16 +75,15 @@ then
     fi
     echo Doctest of cse_helpers.py finished.
 fi
-# Uncomment this test when parse_BSSN is fixed.
-# for file in tests/test_parse_BSSN.py; do
-#     echo Running unittest on file: $file
-#     $PYTHONEXEC $file
-#     if [ $? == 1 ]
-#     then
-#         failed_unittest=1
-#     fi
-#     echo Unittest of $file finished.
-# done
+for file in tests/test_parse_BSSN.py; do
+    echo Running unittest on file: $file
+    $PYTHONEXEC $file
+    if [ $? == 1 ]
+    then
+        failed_unittest=1
+    fi
+    echo Unittest of $file finished.
+done
 
 # Checking failed_tests.txt to see what failed
 contents=$(<$failed_tests_file)

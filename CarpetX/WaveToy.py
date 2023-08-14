@@ -8,26 +8,38 @@ import NRPy_param_funcs as par
 from subprocess import call
 import numpy as np
 from fstr import f
+from outputC import lhrh
+
+par.set_parval_from_str("outputC::PRECISION", "CCTK_REALVEC")
 
 pre_kernel = """
 #include <iostream>
 #include <cmath>
 
 const int nx = 10, ny = 10;
+int mask;
 
 using std::cos;
 using std::sin;
 
+typedef double CCTK_REALVEC;
+
 struct PointDesc {
     static constexpr int DI[3]={0,0,0};
-    double x,y;
+    double x,y,dx=.01,dy=.02;
     int I=0;
 };
+
+namespace Arith {
+template<typename T>
+double iota() { return T(0); }
+}
 
 struct GF {
     double data;
     double& operator()(int n) { return data; }
     double& operator()(int n,int p) { return data; }
+    double& operator()(int n,int l,int p) { return data; }
 };
 
 double cctk_delta_space[3] = {.5, .4};
@@ -146,7 +158,6 @@ def main():
         regrid_error = thorn.get_regrid_error()
     x,y,z = thorn.get_xyz()
 
-    from outputC import lhrh
     import indexedexp as ixp
     import NRPy_param_funcs as par
 
