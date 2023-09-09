@@ -74,7 +74,7 @@ def expr_convert_to_SIMD_intrins(expr, map_sym_to_rat=None, prefix="", SIMD_find
         SqrtSIMD(a)
 
         >>> convert(a**(-1/2))
-        DivSIMD(1, SqrtSIMD(a))
+        DivSIMD(_Integer_1, SqrtSIMD(a))
 
         >>> from sympy import Rational
         >>> convert(a**Rational(1, 3))
@@ -205,7 +205,8 @@ def expr_convert_to_SIMD_intrins(expr, map_sym_to_rat=None, prefix="", SIMD_find
                 subtree.expr = SqrtSIMD(args[0])
                 subtree.children.pop(1)
             elif exponent == -0.5:
-                subtree.expr = DivSIMD(1, SqrtSIMD(args[0]))
+                one = Symbol(prefix + "_Integer_1")
+                subtree.expr = DivSIMD(one, SqrtSIMD(args[0]))
                 tree.build(subtree)
             elif exponent == Rational(1, 3):
                 subtree.expr = CbrtSIMD(args[0])
