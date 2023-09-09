@@ -1,6 +1,7 @@
 """ Convert Expression to SIMD Compiler Intrinsics """
 # Authors: Ken Sible & Zachariah Etienne
 # Emails: ksible *at* outlook *dot** com
+#         assumpcaothiago *at* gmail *dot** com
 #         zachetie *at* gmail *dot** com
 
 from sympy import (Integer, Rational, Float, Function, Symbol,
@@ -75,6 +76,12 @@ def expr_convert_to_SIMD_intrins(expr, map_sym_to_rat=None, prefix="", SIMD_find
 
         >>> convert(a**(-1/2))
         DivSIMD(_Integer_1, SqrtSIMD(a))
+
+        >>> convert(a**(-3/2))
+        DivSIMD(_Integer_1, MulSIMD(a, SqrtSIMD(a)))
+
+        >>> convert(a**(-5/2))
+        DivSIMD(_Integer_1, MulSIMD(MulSIMD(a, a), SqrtSIMD(a)))
 
         >>> from sympy import Rational
         >>> convert(a**Rational(1, 3))
@@ -200,13 +207,21 @@ def expr_convert_to_SIMD_intrins(expr, map_sym_to_rat=None, prefix="", SIMD_find
         func = subtree.expr.func
         args = subtree.expr.args
         if func == Pow:
+            one = Symbol(prefix + "_Integer_1")
             exponent = lookup_rational(args[1])
             if   exponent == 0.5:
                 subtree.expr = SqrtSIMD(args[0])
                 subtree.children.pop(1)
             elif exponent == -0.5:
-                one = Symbol(prefix + "_Integer_1")
                 subtree.expr = DivSIMD(one, SqrtSIMD(args[0]))
+                tree.build(subtree)
+            elif exponent == -1.5:
+                pow_1p5 = (args[0])*SqrtSIMD(args[0])
+                subtree.expr = DivSIMD(one, pow_1p5)
+                tree.build(subtree)
+            elif exponent == -2.5:
+                pow_2p5 = (args[0])*(args[0])*SqrtSIMD(args[0])
+                subtree.expr = DivSIMD(one, pow_2p5)
                 tree.build(subtree)
             elif exponent == Rational(1, 3):
                 subtree.expr = CbrtSIMD(args[0])
