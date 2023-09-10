@@ -59,24 +59,21 @@ def nrpycosh(x):
 have_already_called_reference_metric_function = False
 
 def reference_metric(SymPySimplifyExpressions=True): #, enable_compute_hatted_quantities=True):
-    global f0_of_xx0_funcform, f1_of_xx1_funcform, f2_of_xx0_xx1_funcform, f3_of_xx0_funcform, f4_of_xx2_funcform
-    global f0_of_xx0, f1_of_xx1, f2_of_xx1, f2_of_xx0_xx1, f3_of_xx0, f4_of_xx2
+    global f0_of_xx0_funcform, f1_of_xx1_funcform, f2_of_xx1_funcform, f3_of_xx0_funcform, f4_of_xx2_funcform
+    global f0_of_xx0, f1_of_xx1, f2_of_xx1, f2_of_xx1, f3_of_xx0, f4_of_xx2
     f0_of_xx0_funcform     = sp.Function('f0_of_xx0_funcform')(xx[0])
     f1_of_xx1_funcform     = sp.Function('f1_of_xx1_funcform')(xx[1])
-    # f2_of_xx1_funcform     = sp.Function('f2_of_xx1_funcform')(xx[1])
-    f2_of_xx0_xx1_funcform = sp.Function('f2_of_xx0_xx1_funcform')(xx[0], xx[1])
+    f2_of_xx1_funcform     = sp.Function('f2_of_xx1_funcform')(xx[1])
     f3_of_xx0_funcform     = sp.Function('f3_of_xx0_funcform')(xx[0])
     f4_of_xx2_funcform     = sp.Function('f4_of_xx2_funcform')(xx[2])
-    f0_of_xx0, f1_of_xx1, f2_of_xx1, f2_of_xx0_xx1, f3_of_xx0, f4_of_xx2 = \
+    f0_of_xx0, f1_of_xx1, f2_of_xx1, f3_of_xx0, f4_of_xx2 = \
         par.Cparameters("REAL", thismodule,
-                        ["f0_of_xx0", "f1_of_xx1", "f2_of_xx1", "f2_of_xx0_xx1", "f3_of_xx0", "f4_of_xx2"], 1e300)
+                        ["f0_of_xx0", "f1_of_xx1", "f2_of_xx1", "f3_of_xx0", "f4_of_xx2"], 1e300)
     # FIXME: Hack
     # return values of par.Cparameters() in the following code block are unused, so we ignore them.
     par.Cparameters("REAL", thismodule, ["f0_of_xx0__D0", "f0_of_xx0__DD00","f0_of_xx0__DDD000"], 1e300)
     par.Cparameters("REAL", thismodule, ["f1_of_xx1__D1", "f1_of_xx1__DD11","f1_of_xx1__DDD111"], 1e300)
     par.Cparameters("REAL", thismodule, ["f2_of_xx1__D1", "f2_of_xx1__DD11","f2_of_xx1__DDD111"], 1e300)
-    par.Cparameters("REAL", thismodule,
-                    ["f2_of_xx0_xx1__D0", "f2_of_xx0_xx1__D1", "f2_of_xx0_xx1__DD00", "f2_of_xx0_xx1__DD11"], 1e300)
     par.Cparameters("REAL", thismodule, ["f3_of_xx0__D0", "f3_of_xx0__DD00"], 1e300)
     par.Cparameters("REAL", thismodule, ["f4_of_xx2__D2", "f4_of_xx2__DD22"], 1e300)
 
@@ -398,11 +395,14 @@ def reference_metric(SymPySimplifyExpressions=True): #, enable_compute_hatted_qu
 
         f0_of_xx0              = AA
         f1_of_xx1              = sp.sin(xx[1])
-        f2_of_xx0_xx1          = var1
+        f2_of_xx1              = bScale * sp.sin(xx[1])
         f3_of_xx0              = var2
 
-        scalefactor_orthog_funcform[0] = sp.diff(f0_of_xx0_funcform,xx[0]) * f2_of_xx0_xx1_funcform/f3_of_xx0_funcform
-        scalefactor_orthog_funcform[1] = f2_of_xx0_xx1_funcform
+        var1_funcform = sp.sqrt(
+            f0_of_xx0_funcform**2 + f2_of_xx1_funcform**2
+        )
+        scalefactor_orthog_funcform[0] = sp.diff(f0_of_xx0_funcform,xx[0]) * var1_funcform/f3_of_xx0_funcform
+        scalefactor_orthog_funcform[1] = var1_funcform
         scalefactor_orthog_funcform[2] = f0_of_xx0_funcform*f1_of_xx1_funcform
 
         # Set the transpose of the matrix of unit vectors
@@ -773,8 +773,8 @@ def ref_metric__hatted_quantities(SymPySimplifyExpressions=True):
             basefunc = f0_of_xx0
         elif basename == "f1_of_xx1":
             basefunc = f1_of_xx1
-        elif basename == "f2_of_xx0_xx1":
-            basefunc = f2_of_xx0_xx1
+        elif basename == "f2_of_xx1":
+            basefunc = f2_of_xx1
         elif basename == "f3_of_xx0":
             basefunc = f3_of_xx0
         elif basename == "f4_of_xx2":
