@@ -32,17 +32,11 @@ def add_to_Cfunction_dict_exact_ADM_ID_function(IDtype, IDCoordSystem, alpha, be
     body = ""
     if IDCoordSystem == "Spherical":
         body += r"""
-  REAL xx0,xx1,xx2 __attribute__((unused));  // xx2 might be unused in the case of axisymmetric initial data.
+  const REAL Cartx=xCart[0],Carty=xCart[1],Cartz=xCart[2];
+  REAL r, th, ph;
   {
-    int unused_Cart_to_i0i1i2[3];
-    REAL xx[3];
-    Cart_to_xx_and_nearest_i0i1i2(params, xCart, xx, unused_Cart_to_i0i1i2);
-    xx0=xx[0];  xx1=xx[1];  xx2=xx[2];
-  }
-  const REAL r  = xx0; // Some ID only specify r,th,ph.
-  const REAL th = xx1;
-  const REAL ph = xx2;
-"""
+""" + outputC(rfm.Cart_to_xx[:3], ["r", "th", "ph"], filename="returnstring",
+              params="outCverbose=False,includebraces=False,preindent=2,CSE_varprefix=CarttoSphtmp")
     elif IDCoordSystem == "Cartesian":
         body += r"""  const REAL Cartxyz0=xCart[0], Cartxyz1=xCart[1], Cartxyz2=xCart[2];
 """
