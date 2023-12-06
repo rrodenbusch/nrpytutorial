@@ -269,7 +269,7 @@ def RicciBar__gammabarDD_dHatD__DGammaUDD__DGammaU():
     gammabar__inverse_and_derivs()
 
     # Step 7.a.i: Define \varepsilon_{ij} = epsDD[i][j]
-    epsDD = ixp.zerorank3()
+    epsDD = ixp.zerorank2()
     for i in range(DIM):
         for j in range(DIM):
             epsDD[i][j] = hDD[i][j] * rfm.ReDD[i][j]
